@@ -62,7 +62,7 @@ app.post('/intro', async (req, res) => {
     }
 
     try {
-        user = await userModel.findByIdAndUpdate(userId, {score:response });        
+        user = await userModel.findByIdAndUpdate(userId, {intro_score:response });        
     } catch (err) {
         console.log(err);           
     }
@@ -76,16 +76,29 @@ app.post('/intro', async (req, res) => {
 app.post('/checkApproach', async (req, res) => {
   const q = req.body.question;
   const ans=req.body.approach;
-  var msg=q.concat("consider yourself as a interviewer, see the correctness of this approach and on the basis of it provide the rating out of 10 in the form of integer number strictly no other characters should be present except number, no explanation is required. no space spaces or extra character should be outputed")
+  const userId=req.user._id;
+  var msg=q.concat("consider yourself as a interviewer, see the correction of the approach and on the basis of it provide the rating out of 10 in the form of integer number strictly no other characters should be present except number, no explanation is required. no space spaces or extra character should be outputed, please output only a number nothing else")
   // console.log(ans);
   try {
     const response = await sendMessage(msg,ans);
-    var result = response.replace(/\r\n/g, '');
-    // var num = parseInt(result);
-    // console.log(result);
-    res.status(200).json({ reply: result });
+    var number = response.match(/\d+/)
+    var new_res=parseInt(number[0])
+    var user;
+    console.log(new_res);
+    try {
+        user = await userModel.findById(userId);        
+    } catch (err) {
+        console.log(err);        
+    }
+
+    try {
+        user = await userModel.findByIdAndUpdate(userId, {approach_score:new_res });        
+    } catch (err) {
+        console.log(err);           
+    }
+    res.status(200).json({ reply: new_res });
   } catch (error) {
-    console.error('Search failed:', );
+    console.error('Search failed:',error );
     res.status(500).json({ error: 'Search failed' });
   }
 });
@@ -96,7 +109,7 @@ app.post('/checkCode', async (req, res) => {
   const userId=req.user._id;
 //  console.log(q);
 //  console.log(ans);
-  var s="consider yourself as a interviewer, see the correction of the code and on the basis of it provide the rating out of 80 in the form of integer number strictly no other characters should be present except number, no explanation is required. no space spaces or extra character should be outputed"
+  var s="consider yourself as a interviewer, see the correction of the code and on the basis of it provide the rating out of 70 in the form of integer number strictly no other characters should be present except number, no explanation is required. no space spaces or extra character should be outputed"
   var new_s=q.concat(s);
   // console.log(new_s);
   try {
@@ -110,9 +123,9 @@ app.post('/checkCode', async (req, res) => {
     } catch (err) {
         console.log(err);       
     }
-    const new_score=user.score+num;
+    const new_score=num;
     try {
-        user = await userModel.findByIdAndUpdate(userId, {score:new_score });        
+        user = await userModel.findByIdAndUpdate(userId, {coding_score:new_score });        
     } catch (err) {
       console.log(err);           
     }
@@ -127,7 +140,7 @@ app.get('/getScore', async (req, res) => {
   var user;
     try {
         user = await userModel.findById(userId);       
-        res.status(200).json({name:user.name,score:user.score}); 
+        res.status(200).json({name:user.name,intro_score:user.intro_score,approach_score:user.approach_score,coding_score:user.coding_score}); 
     } catch (err) {
         console.log(err);       
     }

@@ -11,7 +11,15 @@ const userSchema = new mongoose.Schema({
         required: true,
         distinct: true
     },
-    score:{
+    intro_score:{
+        type:Number,
+        default:0
+    },
+    approach_score:{
+        type:Number,
+        default:0
+    },
+    coding_score:{
         type:Number,
         default:0
     },
