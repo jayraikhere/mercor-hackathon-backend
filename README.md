@@ -17,6 +17,9 @@
 ## Title of the Project
 ### `AI Powered Coding Interview Platform`
 
+## Hosted Link
+`https://ai-coding-platform.web.app/`
+
 ## Team Members
 
 <p align="center">
